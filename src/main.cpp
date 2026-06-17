@@ -1,7 +1,7 @@
 #include <Geode/Geode.hpp>
 #include <Geode/utils/web.hpp>
 #include <algorithm>
-#include <geode/modify/CustomSongLayer.hpp>
+#include <Geode/modify/CustomSongLayer.hpp>
 #include <string>
 
 using namespace geode::prelude;
