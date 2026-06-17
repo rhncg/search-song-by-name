@@ -125,7 +125,7 @@ class $modify(ModCustomSongLayer, CustomSongLayer) {
 
                     } else {
                         auto errorAlert = FLAlertLayer::create(
-                            "Error", "Failed to connect to Newgrounds.", "OK");
+                            "Error", "Failed to connect to Newgrounds. Newgrounds might be blocking the request or your internet connection might be down.", "OK");
                         if (errorAlert)
                             errorAlert->show();
                     }

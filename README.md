@@ -4,6 +4,9 @@ Tired of going to Newgrounds to find the ID of a song you want to use? Simply ty
 
 Currently only checks for songs on Newgrounds, although I may update it to query the music library as well.
 
+## Note:
+This mod is only functional due to the deactivation of Newgrounds anti-bot systems. If Newgrounds chooses to reactivate such systems, this mod will no longer be functional.
+
 ## Build instructions
 ```sh
 geode build

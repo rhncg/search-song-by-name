@@ -8,7 +8,7 @@
 	},
 	"id": "rcg21.search-song-by-name",
 	"name": "Search Song By Name",
-	"version": "v1.0.0",
+	"version": "v1.0.1",
 	"developer": "RCG21",
 	"description": "",
 	"dependencies": {
