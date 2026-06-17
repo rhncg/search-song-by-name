@@ -1,0 +1,17 @@
+{
+	"geode": "5.7.1",
+	"gd": {
+		"win": "2.2081",
+		"android": "2.2081",
+		"mac": "2.2081",
+		"ios": "2.2081"
+	},
+	"id": "rcg21.search-song-by-name",
+	"name": "Search Song By Name",
+	"version": "v1.0.0",
+	"developer": "RCG21",
+	"description": "",
+	"dependencies": {
+		"geode.node-ids": ">=v1.23.3"
+	}
+}
