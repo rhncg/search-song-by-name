@@ -13,5 +13,7 @@
 	"description": "",
 	"dependencies": {
 		"geode.node-ids": ">=v1.23.3"
-	}
+	},
+	"tags": ["enhancement", "utility", "api", "online"],
+	"links": {"source": "https://github.com/rhncg/search-song-by-name"}
 }

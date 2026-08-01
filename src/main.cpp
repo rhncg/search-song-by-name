@@ -1,11 +1,14 @@
+#include "getID.hpp"
 #include <Geode/Geode.hpp>
+#include <Geode/ui/MDPopup.hpp>
 #include <Geode/utils/web.hpp>
 #include <algorithm>
-#include <Geode/modify/CustomSongLayer.hpp>
+#include <functional>
 #include <string>
 
 using namespace geode::prelude;
 
+#include <Geode/modify/CustomSongLayer.hpp>
 class $modify(ModCustomSongLayer, CustomSongLayer) {
     struct Fields {
         TaskHolder<web::WebResponse> m_listener;
@@ -76,58 +79,166 @@ class $modify(ModCustomSongLayer, CustomSongLayer) {
         if (isID) {
             CustomSongLayer::onSearch(sender);
         } else {
-            std::string query = searchString;
-            std::replace(query.begin(), query.end(), ' ', '+');
-
-            std::string url = "https://www.newgrounds.com/search/"
-                              "summary?suitabilities=etm&terms=" +
-                              query;
-            auto req = web::WebRequest();
-
             WeakRef<CustomSongLayer> weakSelf = this;
 
-            m_fields->m_listener.spawn(
-                req.get(url), [weakSelf](web::WebResponse const &res) {
+            getIDfromName(
+                searchString, m_fields->m_listener,
+                [weakSelf](std::string foundID) {
                     auto self = weakSelf.lock();
                     if (!self)
                         return;
 
-                    if (res.ok()) {
-                        auto const &rawBytes = res.data();
-                        std::string target =
-                            "https://www.newgrounds.com/audio/listen/";
-
-                        auto it = std::search(rawBytes.begin(), rawBytes.end(),
-                                              target.begin(), target.end());
-
-                        if (it != rawBytes.end()) {
-                            auto idStart = it + target.length();
-                            std::string foundID = "";
-
-                            while (idStart != rawBytes.end() &&
-                                   std::isdigit(*idStart)) {
-                                foundID += static_cast<char>(*idStart);
-                                idStart++;
-                            }
-
-                            if (!foundID.empty() && self->m_songIDInput) {
-                                self->m_songIDInput->setString(foundID.c_str());
-                                self->onSearch(nullptr);
-                                return;
-                            }
+                    if (!foundID.empty()) {
+                        if (self->m_songIDInput) {
+                            self->m_songIDInput->setString(foundID);
+                            self->onSearch(nullptr);
                         }
-
-                        auto alert = FLAlertLayer::create(
-                            "No Results", "No songs matched your search.",
-                            "OK");
-                        if (alert)
-                            alert->show();
-
                     } else {
-                        auto errorAlert = FLAlertLayer::create(
-                            "Error", "Failed to connect to Newgrounds. Newgrounds might be blocking the request or your internet connection might be down.", "OK");
-                        if (errorAlert)
-                            errorAlert->show();
+                        createQuickPopup(
+                            "No Results",
+                            "No songs matched your search or "
+                            "Newgrounds might think you're a "
+                            "bot. Visit Newgrounds to "
+                            "resolve this.",
+                            "OK", "Open Newgrounds", [](auto, bool btn2) {
+                                if (btn2) {
+                                    web::openLinkInBrowser("https://"
+                                                           "www.newgrounds."
+                                                           "com/");
+                                }
+                            });
+                    }
+                });
+        }
+    }
+};
+
+#include <Geode/modify/MoreSearchLayer.hpp>
+class $modify(ModMoreSearchLayer, MoreSearchLayer) {
+    struct Fields {
+        TaskHolder<web::WebResponse> m_listener;
+    };
+
+    bool init() {
+        if (!MoreSearchLayer::init())
+            return false;
+
+        if (this->m_enterSongID) {
+            this->m_enterSongID->setAllowedChars(
+                "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+                " ");
+            this->m_enterSongID->setMaxLabelLength(200);
+
+            if (auto children = this->m_enterSongID->getChildren()) {
+                for (int i = 0; i < children->count(); ++i) {
+                    if (auto label = typeinfo_cast<CCLabelBMFont *>(
+                            children->objectAtIndex(i))) {
+                        if (std::string(label->getString()).find("Enter") !=
+                            std::string::npos) {
+                            label->setString("Song Name or ID");
+                            break;
+                        }
+                    }
+                }
+            }
+
+            this->m_enterSongID->refreshLabel();
+        }
+
+        auto searchSpr =
+            CCSprite::createWithSpriteFrameName("gj_findBtn_001.png");
+
+        auto searchBtn = CCMenuItemSpriteExtra::create(
+            searchSpr, this, menu_selector(ModMoreSearchLayer::onSearch));
+
+        auto menu = CCMenu::create();
+        menu->addChild(searchBtn);
+        menu->setPosition(m_enterSongID->getPosition() + ccp(-110.f, 0.f));
+
+        menu->setID("song-name-search-menu"_spr);
+
+        if (this->m_customSongNodes) {
+            this->m_customSongNodes->addObject(menu);
+        }
+
+        if (this->m_mainLayer) {
+            this->m_mainLayer->addChild(menu);
+        } else {
+            this->addChild(menu);
+        }
+
+        this->updateLayout();
+
+        return true;
+    }
+
+    void toggleSongNodes(bool custom, bool disable) {
+        MoreSearchLayer::toggleSongNodes(custom, disable);
+
+        if (auto menu =
+                this->m_mainLayer->getChildByID("song-name-search-menu"_spr)) {
+            menu->setVisible(custom && !disable);
+        }
+
+        if (custom && !disable && this->m_enterSongID) {
+            this->m_enterSongID->setAllowedChars(
+                "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+                " ");
+            this->m_enterSongID->setMaxLabelLength(200);
+
+            if (auto children = this->m_enterSongID->getChildren()) {
+                for (int i = 0; i < children->count(); ++i) {
+                    if (auto label = typeinfo_cast<CCLabelBMFont *>(
+                            children->objectAtIndex(i))) {
+                        if (std::string(label->getString()).find("Enter") !=
+                            std::string::npos) {
+                            label->setString("Song Name or ID");
+                            break;
+                        }
+                    }
+                }
+            }
+
+            this->m_enterSongID->refreshLabel();
+        }
+    }
+
+    void onSearch(CCObject *sender) {
+        auto searchString = m_enterSongID->getString();
+        if (searchString == "")
+            return;
+
+        bool isID =
+            !searchString.empty() &&
+            std::all_of(searchString.begin(), searchString.end(), ::isdigit);
+
+        if (!isID) {
+            WeakRef<MoreSearchLayer> weakSelf = this;
+
+            getIDfromName(
+                searchString, m_fields->m_listener,
+                [weakSelf](std::string foundID) {
+                    auto self = weakSelf.lock();
+                    if (!self)
+                        return;
+                    if (!foundID.empty()) {
+                        if (self->m_enterSongID) {
+                            self->m_enterSongID->setString(foundID);
+                        }
+                    } else {
+                        createQuickPopup(
+                            "No Results",
+                            "No songs matched your search or "
+                            "Newgrounds might think you're a "
+                            "bot. Visit Newgrounds to "
+                            "resolve this.",
+                            "OK", "Open Newgrounds", [](auto, bool btn2) {
+                                if (btn2) {
+                                    web::openLinkInBrowser("https://"
+                                                           "www.newgrounds."
+                                                           "com/");
+                                }
+                            });
                     }
                 });
         }
