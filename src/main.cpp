@@ -204,7 +204,7 @@ class $modify(ModMoreSearchLayer, MoreSearchLayer) {
     }
 
     void onSearch(CCObject *sender) {
-        auto searchString = m_enterSongID->getString();
+        std::string searchString = m_enterSongID->getString();
         if (searchString == "")
             return;
 
