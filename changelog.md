@@ -1,3 +1,6 @@
+# 1.1.1
+- Fixed search button showing up in Advanced Options popup when not filtering by song
+
 # 1.1.0
 - Added search functionality to Advanced Options popup in the search page
 - Added source and tags to mod metadata

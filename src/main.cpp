@@ -156,6 +156,7 @@ class $modify(ModMoreSearchLayer, MoreSearchLayer) {
         menu->setPosition(m_enterSongID->getPosition() + ccp(-110.f, 0.f));
 
         menu->setID("song-name-search-menu"_spr);
+        menu->setVisible(false);
 
         if (this->m_customSongNodes) {
             this->m_customSongNodes->addObject(menu);
