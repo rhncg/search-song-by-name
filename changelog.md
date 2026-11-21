@@ -1,3 +1,7 @@
+# 1.1.2
+- Support for Geode v6
+- Fixed bug where search button would not appear if custom song field was already selected on popup open
+
 # 1.1.1
 - Fixed search button showing up in Advanced Options popup when not filtering by song
 
