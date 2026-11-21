@@ -1,5 +1,6 @@
 # 1.1.2
-- Support for Geode v6
+- Support for Geode v6 (iOS and macOS temporarily not supported)
+
 - Fixed bug where search button would not appear if custom song field was already selected on popup open
 
 # 1.1.1
