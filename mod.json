@@ -2,7 +2,9 @@
 	"geode": "6.0.0-beta.1",
 	"gd": {
 		"win": "2.2091",
-		"android": "2.2091"
+		"android": "2.2091",
+		"mac": "2.2091",
+		"ios": "2.2091"
 	},
 	"id": "rcg21.search-song-by-name",
 	"name": "Search Song By Name",
@@ -12,6 +14,6 @@
 	"dependencies": {
 		"geode.node-ids": ">=v1.23.3"
 	},
-	"tags": ["enhancement", "utility", "api", "online"],
+	"tags": ["enhancement", "utility", "online"],
 	"links": {"source": "https://github.com/rhncg/search-song-by-name"}
 }
